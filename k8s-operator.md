@@ -104,27 +104,29 @@ func (r *NginxReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl
 
 ### 5. 部署 operator
 
-#### 1. 修改 Makefile 
+#### 1. 编译并部署 operator 镜像
+
+修改 Makefile
 
 ```
 -IMG ?= controller:latest
 +IMG ?= $(IMAGE_TAG_BASE):$(VERSION)
 ```
-#### 2. 编译并部署 operator 镜像
+编译并部署 operator 到 k8s 集群
 
 ```bash
 make docker-build
 make deploy
 ```
 
-#### 3. 查看 deployment
+#### 2. 查看 deployment
 
 ```
 $ kubectl get deployment -n nginx-operator-system
 NAME                                READY   UP-TO-DATE   AVAILABLE   AGE
 nginx-operator-controller-manager   1/1     1            1           5m14s
 ```
-#### 4. 创建 Nginx CR
+#### 3. 创建 Nginx CR
 
 修改文件 config/samples/proxy_v1alpha1_nginx.yaml 如下:
 
@@ -148,7 +150,7 @@ nginx-sample-66b6c48dd5-thnx6   1/1     Running   0          15m
 nginx-sample-66b6c48dd5-xrd9l   1/1     Running   0          15m
 ```
 
-#### 5. 检查 CR 的状态
+#### 4. 检查 CR 的状态
 
 ```
 $ kubectl get nginx/nginx-sample -o yaml
