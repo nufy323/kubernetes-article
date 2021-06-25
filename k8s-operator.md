@@ -2,7 +2,7 @@
 
 ## k8s operator 介绍
 
-k8s Operator 是一种特定于应用的控制器，可扩展 Kubernetes API 的功能，来代表 k8s 用户创建、配置和管理复杂应用的实例，它基于基本 k8s 资源和控制器概念构建，但又涵盖了特定领域或应用的知识，用于实现其所管理的应用生命周期的自动化，常见的有 [etcd-operator](https://github.com/coreos/etcd-operator)、[prometheus-operator](https://github.com/prometheus-operator/prometheus-operator) 等，以下是 k8s operator 执行的一些最常见功能的列表：
+k8s Operator 是一种用于特定应用的控制器，可扩展 Kubernetes API 的功能，来代表 k8s 用户创建、配置和管理复杂应用的实例，它基于基本 k8s 资源和控制器概念构建，但又涵盖了特定领域或应用的知识，用于实现其所管理的应用生命周期的自动化，常见的有 [etcd-operator](https://github.com/coreos/etcd-operator)、[prometheus-operator](https://github.com/prometheus-operator/prometheus-operator) 等，以下是 k8s operator 执行的一些最常见功能的列表：
 
 * 部署指定配置和数量的应用
 * 对应用进行扩缩容
