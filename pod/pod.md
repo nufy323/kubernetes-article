@@ -98,7 +98,7 @@ spec:
     - containerPort: 80
 ```
 
-执行 `kubectl describe pod nginx` 查看 pod 的状态，如下所示展示了 pod 部分信息，`Status` 字段是 pod 在其生命周期中的一个摘要介绍值，Running 表示 pod 处于正常运行状态
+执行 `kubectl describe pod nginx` 查看 pod 的状态，如下所示展示了 pod 部分信息，`Status` 字段是 pod 在其生命周期中的一个摘要介绍，Running 表示 pod 处于正常运行状态
 
 ```bash
 Name:         nginx
