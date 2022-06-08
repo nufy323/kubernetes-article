@@ -83,7 +83,7 @@ pod 使用方式可以被分为两种类型：
 
 ### 创建 Pod
 
-通过如下方式 `kubectl apply -f nginx-pod.yaml` 创建 pod，并通过 `kubectl get pod` 查看 pod 的状态，如下图所示。
+通过如下方式 `kubectl apply -f nginx-pod.yaml` 创建 pod，并通过 `kubectl get pod` 查看 pod 的状态，如下所示。
 
 ```yml
 apiVersion: v1 
@@ -98,7 +98,7 @@ spec:
     - containerPort: 80
 ```
 
-使用 `kubectl describe pod nginx` 查看 pod 的状态，如下所示展示了 pod 部分信息，`Status` 为 Running 表示 pod 处于运行状态
+执行 `kubectl describe pod nginx` 查看 pod 的状态，如下所示展示了 pod 部分信息，`Status` 字段是 pod 在其生命周期中的一个摘要介绍值，Running 表示 pod 处于正常运行状态
 
 ```bash
 Name:         nginx
@@ -119,7 +119,7 @@ Containers:
 
 ### pod 的生命周期
 
-Pod 创建完成后，遵循定义的生命周期，从 Pending 阶段开始，如果至少一个容器启动正常，则进入 Running，然后根据 Pod 中的任何容器是否因故障终止而进入 Succeeded 或 Failed 阶段，上文所述 `Status` 字段是 pod 在其生命周期中的一个摘要介绍，包含一下几种状态
+Pod 创建完成后，遵循定义的生命周期，从 Pending 阶段开始，如果 pod 内至少一个容器启动正常，则进入 Running，然后根据 Pod 中的任何容器是否因故障终止而进入 Succeeded 或 Failed 阶段，pod 在其生命周期可能处于以下几种状态
 
 * Pending： Pod 已被 Kubernetes 集群接受，但一个或多个容器尚未准备好运行。这包括 Pod 等待调度所花费的时间以及通过网络下载容器镜像所花费的时间。
 * Running： Pod 已绑定到一个节点，并且所有容器都已创建。至少有一个容器仍在运行，或者正在启动或重新启动过程中。
@@ -136,22 +136,22 @@ Pod 创建完成后，遵循定义的生命周期，从 Pending 阶段开始，�
 ![avatar](./create_pod.png)
 
 
-1. 用户通过 `Kubectl` 提交 `Pod` 描述文件到 `API Server`；
-2. `API Server` 将 `Pod` 对象的信息存入 `Etcd`；
-3. `Pod` 的创建会生成事件，返回给 `API Server`；
-4. `Controller` 监听到事件；
-5. `Controller` 知道这个 `Pod` 要 `mount` 一个盘，于是查看是否有能够满足条件的 `PV`；
-6. 假设有满足条件的 `PV`，就将 `Pod` 和 `PV` 绑定在一起，将绑定关系告知 `API Server`；
-7. `API Server` 将绑定信息写入 `Etcd` 中；
-8. 生成 `Pod Update` 事件；
-9. `Scheduler` 监听到了这个事件；
-10. `Scheduler` 需要为 `Pod` 选择一个 `Node`；
-11. 如有满足条件的 `Node`，就把 `Pod` 和 `Node` 绑定在一起，将绑定关系告知 `API Server`；
-12. `API Server` 将绑定信息写入 `Etcd` 中；
-13. 生成 `Pod Update` 事件；
-14. `Kubelet`  监听到 `Pod Update` 事件，创建 `Pod`；
-15. `Kubelet` 告知 `CRI`(容器运行时接口) 去下载镜像；
-16. `Kubelet` 告知 `CRI` 运行容器；
-17. `CRI` 调用 `Docker` 运行容器；
-18. `Kubelet` 告知 `Volume Manager`，将盘挂在到 `Node`，然后 `mount` 到 `Pod`；
-19. `CRI` 调用 `CNI`(容器网络接口) 为容器配置网络；
+1. 用户通过 Kubectl 提交 Pod` 描述文件到 API Server；
+2. API Server 将 Pod 对象的信息存入 Etcd；
+3. Pod 的创建会生成事件，返回给 API Server；
+4. Controller 监听到事件；
+5. Pod 如果需要要挂载盘，Controller 会检查是否有满足条件的 PV；
+6. 若满足条件的 PV，Controller 会绑定 Pod 和 PV，将绑定关系告知 API Server；
+7. API Server 将绑定信息写入 Etcd；
+8. 生成 Pod Update 事件；
+9. Scheduler 监听到 Pod Update 事件；
+10. Scheduler 会为 Pod 选择 Node；
+11. 如有满足条件的 Node，Scheduler 会绑定 Pod 和 Node，并将绑定关系告知 API Server；
+12. API Server 将绑定信息写入 Etcd；
+13. 生成 Pod Update 事件；
+14. Kubelet 监听到 Pod Update 事件，创建 Pod；
+15. Kubelet 告知 CRI(容器运行时接口) 下载镜像；
+16. Kubelet 告知 CRI 运行容器；
+17. CRI 调用 Docker 运行容器；
+18. Kubelet 告知 Volume Manager，将盘挂在到 Node 同时挂载到 Pod；
+19. CRI 调用 CNI(容器网络接口) 配置容器网络；
