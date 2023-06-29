@@ -151,5 +151,5 @@ Chain KUBE-SEP-SKMF2UJJQ24AYOPG (1 references)
     0     0 DNAT       tcp  --  *      *       0.0.0.0/0            0.0.0.0/0            /* default/my-service: */ tcp to:10.42.0.7:80
 ```
 
-从上问所述可知在 Service 创建时会生成大量的 iptalbes 规则，当服务数量非常庞大时 iptables 规则也会成倍增长，带来的问题是路由延迟和服务访问延迟，而且由于 iptables 使用非增量式更新当规则数量庞大时添加或删除一条规则也有较大延迟, 为了解决该问题所以 kubernetes 在 1.11 之后版本推出了 ipvs 模式，如想详细了解可参考 https://kubernetes.io/blog/2018/07/09/ipvs-based-in-cluster-load-balancing-deep-dive/#ipvs-based-kube-proxy
+从上问所述可知在 Service 创建时会生成大量的 iptalbes 规则，当服务数量非常庞大时 iptables 规则也会成倍增长，带来的问题是路由延迟和服务访问延迟，而且由于 iptables 使用非增量式更新当规则数量庞大时添加或删除一条规则也有较大延迟, 为了解决该问题所以 kubernetes 在 1.11 之后版本推出了 ipvs 模式，如想详细了解可参考 https://kubernetes.io/blog/2018/07/09/ipvs-based-in-cluster-load-balancing-deep-dive
 
