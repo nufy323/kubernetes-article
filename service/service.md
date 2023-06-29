@@ -94,7 +94,7 @@ my-service   10.42.0.7:80,10.42.1.3:80,10.42.1.4:80   7d3h
 
 Endpoint 是 Kubernetes 集群中的一个资源对象存储在 etcd 中，从上文可以看到 Endpoint 中保存了一个 Service 对应的所有 Pod 的访问地址，Endpoint 的创建和更新是通过 Endpoint Controller，当我们通过API创建/修改 Service 对象时，Endpoints Controller 的 informer 机制监听到 Service对象更新，然后根据 Service 的配置的 Selector 创建对应 Endpoint 对象，此对象将 Pod 的 IP、容器端口做记录并存储到 Etcd，这样 Service 只要看一下自己名下的 Endpoint 就可以知道所对应Pod信息了。 
 
-Endpoint Controller 是 kube-controller-manager 组件中众多控制器中的一个，是 Endpoint 资源对象的控制器，其通过对 Service、Pod 两种种资源的监听，对相应的 EndPoint 资源进行管理，主要包括以下功能:
+Endpoint Controller 是 kube-controller-manager 组件中众多控制器中的一个，是 Endpoint 资源对象的控制器，其通过对 Service、Pod 两种资源的监听实现对的 Endpoint 资源进行管理，主要包括以下功能:
 
 * 负责生成和维护所有 Endpoint 对象
 * 负责监听 Service 和对应 Pod 的变化
