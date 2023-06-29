@@ -69,7 +69,7 @@ Service 在我们使用 Kubernetes 几乎必不可少的一个资源对象主要
 
 * 集群中的每一个 Pod 都可以通过 PodIP 被直接访问的，但是 Kubernetes 中的 Pod 是有生命周期的对象，尤其是被 ReplicaSet、Deployment 等对象管理的 Pod，随时都有可能由于集群的状态变化被销毁和创建，导致 Pod 的 IP 发生变化
 * Pod 被 Kubernetes 调度到确定的节点后，才会为 Pod 分配 IP 地址，在启动之前客户端无法知道服务器 Pod 的 IP 地址。
-* 水平扩展意味着多个 Pod 可以提供相同的服务——每个 Pod 都可以提供相同的服务 Pod 有自己的 IP 地址。客户端不应该关心有多少 Pod 支持服务及其 IP 是什么而且不应该保留所有 Pod 的 IP 列表。相反所有这些 Pod 都应该可以通过单个 IP 地址提供服务
+* 水平扩展意味着多个 Pod 可以提供相同的服务，每个 Pod 都可以提供相同的服务 Pod 有自己的 IP 地址。客户端不应该关心有多少 Pod 支持服务及其 IP 是什么而且不应该保留所有 Pod 的 IP 列表。相反所有这些 Pod 都应该可以通过单个 IP 地址提供服务
 
 
 ## Service 工作原理
@@ -101,18 +101,18 @@ Endpoint Controller 是 kube-controller-manager 组件中众多控制器中的�
 * 监听到 Service 被删除，则删除和该 Service 同名的 Endpoint 对象
 * 监听到新的 Service 被创建，则根据新建 Service 信息获取相关 Pod 列表，然后创建对应 Endpoint 对象
 * 监听到 Service 被更新，则根据更新后的 Service 信息获取相关 Pod 列表，然后更新对应 Endpoint 对象
-* 监听到 Pod 事件，则更新 endpoint 对象保存的 Pod IP 列表, 如 Pod 处于非健康状态时从保存的 IP 列表中移除，恢复时再重新加入
+* 监听到 Pod 事件，则更新 endpoint 对象保存的 Pod IP 列表, 如 Pod 处于非健康状态时则把 Pod 从保存的 IP 列表中移除，恢复时再重新加入
 
 
 
 
 #### kube-proxy 
 
-kube-proxy 是 kubernetes 一个网络代理组件，运行在每个 worker 节点上。Kube-proxy 维护节点上的网络规则，实现了 Kubernetes Service 概念的一部分，它的作用是使发往 Service 的流量（通过ClusterIP和端口）负载均衡到正确的后端Pod,
-kube-proxy 支持多种配置模式主要包扩 iptable 和 ipvs 模式，本文则基于 iptable 模式 kube-proxy 的主要职责包括两大块：
+kube-proxy 是 kubernetes 一个网络代理组件，运行在每个 worker 节点上。Kube-proxy 维护节点上的网络规则，实现了 Kubernetes Service 概念的一部分，它的作用是使发往 Service 的流量（通过ClusterIP和端口）负载均衡到正确的后端 Pod,
+kube-proxy 支持多种配置模式主要包括 iptable 和 ipvs 模式，本文则基于 iptable 模式描述 kube-proxy 的工作原理， kube-proxy 的主要职责包括两大块：
 
-* 监听 Service 更新事件，并更新 Service 相关的 iptables 规则，
-* 监听 Endpoint 更新事件，更新 Endpoint 相关的 iptables 规则, 如 KUBE-SVC-链中的规则会把包请求转入 Endpoint 对应的Pod。如果某个 Service 尚没有 Pod 创建，那么针对此 Service 的请求将会被 drop 掉
+* 监听 Service 更新事件，并更新 Service 相关的 iptables 规则。
+* 监听 Endpoint 更新事件，更新 Endpoint 相关的 iptables 规则, 如 KUBE-SVC-链中的规则会把包请求转入 Endpoint 对应的Pod。如果某个 Service 尚没有 Pod 创建，那么针对此 Service 的请求将会被 drop 掉。
 
 在 iptables 模式下,创建 Service 会创建一系列的 iptable 规则，
 
