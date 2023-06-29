@@ -30,7 +30,7 @@ spec:
         - containerPort: 80
 ```
 
-如下 Deeplyment 创建了三个 Pod
+如下使用 Deployment 创建了三个 Pod
 
 ```
 NAME                                READY   STATUS    RESTARTS   AGE    IP          NODE     NOMINATED NODE   READINESS GATES
@@ -39,7 +39,7 @@ nginx-deployment-6b474476c4-mp8vw   1/1     Running   0          7d2h   10.42.0.
 nginx-deployment-6b474476c4-wh8xd   1/1     Running   0          7d2h   10.42.1.4   node8    <none>           <none>
 ```
 
-接下来我们定义一个名为 my-service 的 Service 资源并指定选择器为 app=nginx, 其中 selector 定义了可以通过 Label Selector 访问 Pod 组。
+接下来我们定义一个名为 my-service 的 Service 资源并指定选择器为 app=nginx, 其中 selector 定义了可以通过 Label Selector 访问的 Pod 组。
 
 ```yml
 apiVersion: v1
@@ -80,19 +80,19 @@ Service 在我们使用 Kubernetes 几乎必不可少的一个资源对象主要
 
 1. 当我们发起创建 Service 请求时 kube-apiserver 会生成一个 Service 对象并将其保存到 ETCD
 2. Endpoint Controller 在订阅到 Service 创建时会创建对应的 Endpoint 对象
-3. kube-proxy 会订阅 Service 和 Endpoint 变动改变节点上 iptables/ipvs 中保存的规则。
+3. kube-proxy 会订阅 Service 和 Endpoint 变动，以此改变节点上 iptables/ipvs 中保存的规则。
 
-接下来会分别介绍这量大模块是何协作实现 Service 功能
+接下来会分别介绍这两大模块是何协作实现 Service 功能
 
 #### endpoint
 
-如上文所述当我们创建 Service 时，同时也会生成如下所示的 endpoint，
+如上文所述当我们创建 Service 时，同时也会生成如下所示的 Endpoint，
 ```
 NAME         ENDPOINTS                                AGE
 my-service   10.42.0.7:80,10.42.1.3:80,10.42.1.4:80   7d3h
 ```
 
-Endpoint 是 Kubernetes 集群中的一个资源对象存储在etcd中，从上文可以看到 Endpoint 中保存了一个 Service 对应的所有 Pod 的访问地址，Endpoint 的创建和更新是通过 Endpoint Controller，当我们通过API创建/修改 Service 对象时，Endpoints Controller 的 informer 机制监听到 Service对象更新，然后根据 Service 的配置的 Selector 创建对应 Endpoint 对象，此对象将 Pod 的 IP、容器端口做记录并存储到 Etcd，这样 Service 只要看一下自己名下的 Endpoint 就可以知道所对应Pod信息了。 
+Endpoint 是 Kubernetes 集群中的一个资源对象存储在 etcd 中，从上文可以看到 Endpoint 中保存了一个 Service 对应的所有 Pod 的访问地址，Endpoint 的创建和更新是通过 Endpoint Controller，当我们通过API创建/修改 Service 对象时，Endpoints Controller 的 informer 机制监听到 Service对象更新，然后根据 Service 的配置的 Selector 创建对应 Endpoint 对象，此对象将 Pod 的 IP、容器端口做记录并存储到 Etcd，这样 Service 只要看一下自己名下的 Endpoint 就可以知道所对应Pod信息了。 
 
 Endpoint Controller 是 kube-controller-manager 组件中众多控制器中的一个，是 Endpoint 资源对象的控制器，其通过对 Service、Pod 两种种资源的监听，对相应的 EndPoint 资源进行管理，主要包括以下功能:
 
